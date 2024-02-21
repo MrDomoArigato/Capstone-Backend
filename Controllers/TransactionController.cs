@@ -12,8 +12,9 @@ public class TransactionController(CapstoneContext context, ILogger<TransactionC
     private readonly CapstoneContext _context = context;
     private readonly ILogger<TransactionController> _logger = logger;
 
+    //TODO Remove b4 release
     [HttpGet]
-    public async Task<ActionResult<List<Transaction>>> GetTransactions()
+    public async Task<ActionResult<List<Transaction>>> GetAllTransactions()
     {
         var transactions = await _context.Transactions.ToListAsync();
         /* new HashSet<Transaction>
@@ -32,5 +33,29 @@ public class TransactionController(CapstoneContext context, ILogger<TransactionC
         }; */
 
         return Ok(transactions);
+    }
+
+    [HttpGet("{accountId}")]
+    public async Task<ActionResult<List<Transaction>>> GetTransactions(int accountId)
+    {
+        var transactions = await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
+
+        return Ok(transactions);
+    }
+
+    [HttpGet("{accountId}:{transactionId}")]
+    public async Task<ActionResult<List<Transaction>>> GetTransaction(int accountId, int transactionId)
+    {
+        var transactions = await _context.Transactions
+            .Where(t => t.AccountId == accountId)
+            .Where(t => t.TransactionId == transactionId)
+            .ToListAsync();
+
+        return Ok(transactions);
+    }
+
+    [HttpPost("{accountId}:{transactionId}")]
+    public void CreateTransaction(int accountId, int transactionId){
+        
     }
 }

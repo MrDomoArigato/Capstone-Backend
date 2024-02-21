@@ -10,7 +10,7 @@ var dbconnection = builder.Configuration.GetSection("db-connection").Get<DBConne
 builder.Services.AddControllers();
 //Sets up database connection for reference
 builder.Services.AddDbContext<CapstoneContext>(options => {
-                options.UseNpgsql($"Host={dbconnection.Host}:{dbconnection.Port};Database={dbconnection.Database};Username={dbconnection.Username};Password={dbconnection.Password}");
+                options.UseNpgsql($"Host={dbconnection!.Host}:{dbconnection!.Port};Database={dbconnection!.Database};Username={dbconnection!.Username};Password={dbconnection!.Password}");
             });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

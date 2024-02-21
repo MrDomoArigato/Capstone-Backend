@@ -10,7 +10,7 @@ namespace CapstoneApi.Controllers;
 [Route("[controller]")]
 public class AccountController(CapstoneContext context, ILogger<AccountController> logger) : ControllerBase
 {
-    private readonly CapstoneContext _context;
+    private readonly CapstoneContext _context = context;
 
     private readonly ILogger<AccountController> _logger = logger;
 
