@@ -1,3 +1,7 @@
+
+
+namespace CapstoneApi.Data;
+
 //Account Model
 public class Account
 {
