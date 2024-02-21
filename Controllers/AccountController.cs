@@ -1,44 +1,45 @@
 using System.Collections.Generic;
+using CapstoneApi.Data;
+using CapstoneApi.Database;
 using Microsoft.AspNetCore.Mvc;
 
-namespace capstone.Controllers;
-
-
-
-//Updated DbContext
-public ISet<Account> Accounts { get; set; }
+namespace CapstoneApi.Controllers;
 
 //Account Controller
 [ApiController]
 [Route("[controller]")]
-public class AccountsController : ControllerBase
+public class AccountController(CapstoneContext context, ILogger<AccountController> logger) : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly CapstoneContext _context;
 
-    public AccountsController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    private readonly ILogger<AccountController> _logger = logger;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Account>>> GetAllAccounts()
+    public async Task<ActionResult<List<Account>>> GetAllAccounts()
     {
-        return await _context.Accounts.ToListAsync();
+        var account = new List<Account>{
+            new Account{
+                AccountId = 1,
+                AccountName = "Account Name",
+                AccountOwner = "owner",
+                Balance = 1.00m
+            }
+        };
+        return Ok(account);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Account>> GetAccount(int id)
     {
-        var account = await _context.Accounts
-            .Include(a => a.Transactions) 
-            .FirstOrDefaultAsync(a => a.AccountId == id);
-
-        if (account == null)
-        {
-            return NotFound();
-        }
-
-        return account;
+        var account = new List<Account>{
+            new Account{
+                AccountId = 1,
+                AccountName = "Account Name",
+                AccountOwner = "owner",
+                Balance = 1.00m
+            }
+        };
+        return Ok(account);
     }
 }
 

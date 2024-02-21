@@ -7,16 +7,10 @@ namespace CapstoneApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class TransactionController : ControllerBase
+public class TransactionController(CapstoneContext context, ILogger<TransactionController> logger) : ControllerBase
 {
-    private readonly CapstoneContext _context;
-    private readonly ILogger<TransactionController> _logger;
-
-    public TransactionController(CapstoneContext context, ILogger<TransactionController> logger)
-    {
-        _context = context;
-        _logger = logger;
-    }
+    private readonly CapstoneContext _context = context;
+    private readonly ILogger<TransactionController> _logger = logger;
 
     [HttpGet]
     public async Task<ActionResult<List<Transaction>>> GetTransactions()

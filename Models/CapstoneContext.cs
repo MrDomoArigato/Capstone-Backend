@@ -17,6 +17,7 @@ public partial class CapstoneContext : DbContext
     }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
+    public virtual DbSet<Account> Accounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
