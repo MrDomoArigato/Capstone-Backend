@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CapstoneApi.Data;
+﻿using CapstoneApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace CapstoneApi.Database;
@@ -19,6 +17,7 @@ public partial class CapstoneContext : DbContext
     public virtual DbSet<Transaction> Transactions { get; set; }
     public virtual DbSet<Account> Accounts { get; set; }
 
+    #warning TODO: change schema b4 release
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Transaction>(entity =>
@@ -32,24 +31,49 @@ public partial class CapstoneContext : DbContext
             entity.Property(e => e.Amount)
                 .HasPrecision(8, 2)
                 .HasColumnName("amount");
-            entity.Property(e => e.Balance)
-                .HasPrecision(10, 2)
-                .HasColumnName("balance");
             entity.Property(e => e.CreationDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("creationdate");
             entity.Property(e => e.Description)
                 .HasMaxLength(80)
                 .HasColumnName("description");
+            entity.Property(e => e.TransactionDate)
+                .HasColumnName("transactiondate");
             entity.Property(e => e.ModificationDate)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("modificationdate");
             entity.Property(e => e.TransactionType)
                 .HasMaxLength(10)
                 .HasColumnName("transactiontype");
-            entity.Property(e => e.Type)
-                .HasMaxLength(255)
-                .HasColumnName("type");
+        });
+
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.HasKey(e => e.AccountId).HasName("accounts_pkey");
+
+            entity.ToTable("accounts", "dev");
+
+            entity.Property(e => e.AccountId)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("accountid");
+            entity.Property(e => e.AccountName)
+                .HasMaxLength(25)
+                .HasColumnName("accountname");
+            entity.Property(e => e.AccountOwner)
+                .HasMaxLength(20)
+                .HasColumnName("accountowner");
+            entity.Property(e => e.Balance)
+                .HasPrecision(10, 2)
+                .HasColumnName("balance");
+            entity.Property(e => e.BalanceModification)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("balmodificationdate");
+            entity.Property(e => e.ModificationDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("modificationdate");
+            entity.Property(e => e.CreationDate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("creationdate");
         });
 
         OnModelCreatingPartial(modelBuilder);

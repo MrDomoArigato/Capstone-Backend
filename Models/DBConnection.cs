@@ -1,3 +1,6 @@
+
+namespace CapstoneApi.Data;
+
 public class DBConnection
 {
     public required string Host { get; init; }
