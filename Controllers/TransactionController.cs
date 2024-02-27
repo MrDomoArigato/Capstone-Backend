@@ -2,15 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using CapstoneApi.Database;
 using CapstoneApi.Data;
+using Microsoft.VisualBasic;
+using CapstoneApi.Services;
 
 namespace CapstoneApi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class TransactionController(CapstoneContext context, ILogger<TransactionController> logger) : ControllerBase
+public class TransactionController(
+    CapstoneContext context, 
+    ILogger<TransactionController> logger, 
+    ITransactionService transactionService) : ControllerBase
 {
     private readonly CapstoneContext _context = context;
     private readonly ILogger<TransactionController> _logger = logger;
+
+    private readonly ITransactionService _tService = transactionService;
 
     //TODO Remove b4 release
     [HttpGet]
@@ -38,24 +45,43 @@ public class TransactionController(CapstoneContext context, ILogger<TransactionC
     [HttpGet("{accountId}")]
     public async Task<ActionResult<List<Transaction>>> GetTransactions(int accountId)
     {
-        var transactions = await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
-
-        return Ok(transactions);
+        return Ok(await _tService.GetTransactionsAsync(accountId));
     }
 
     [HttpGet("{accountId}:{transactionId}")]
-    public async Task<ActionResult<List<Transaction>>> GetTransaction(int accountId, int transactionId)
+    public async Task<ActionResult<Transaction>> GetTransaction(int accountId, int transactionId)
     {
-        var transactions = await _context.Transactions
-            .Where(t => t.AccountId == accountId)
-            .Where(t => t.TransactionId == transactionId)
-            .ToListAsync();
+        var transaction = await _tService.GetTransactionAsync(accountId, transactionId);
 
-        return Ok(transactions);
+        if(transaction is null)
+            return BadRequest();
+        return Ok();
     }
 
-    [HttpPost("{accountId}:{transactionId}")]
-    public void CreateTransaction(int accountId, int transactionId){
-        
+    [HttpPost]
+    public async Task<ActionResult<Transaction>> CreateTransaction(Transaction rawTransaction){
+        var result = _tService.CreateTransaction(rawTransaction);
+        if(result is null)
+            return BadRequest();
+        return Ok(result);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<Transaction>> UpdateTransaction(Transaction updated){
+        var result = await _tService.UpdateTransactionAsync(updated);
+
+        if(result is null)
+            return BadRequest();
+        return result;
+    }
+
+    [HttpDelete("{accountId}:{transactionId}")]
+    public async Task<ActionResult> DeleteTransaction(int accountId, int transactionId){
+        var transaction = _tService.DeleteTransaction(accountId, transactionId);
+
+        if(transaction is null)
+            return BadRequest();
+
+        return Ok();
     }
 }
