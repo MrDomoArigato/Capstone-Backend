@@ -7,6 +7,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddConsole();
 
+# warning TODO: Fix before final release
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "_acceptAnyDomain",
+                      policy =>
+                      {
+                          policy.AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials()
+                          .SetIsOriginAllowed(origin => true);
+                      });
+});
+
 //Gets DB connect from secrets 
 var dbconnection = builder.Configuration.GetSection("db-connection").Get<DBConnection>();
 
@@ -19,12 +32,13 @@ builder.Services.AddDbContext<CapstoneContext>(options => {
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.MapGet("/", () => dbconnection);
+//app.MapGet("/", () => dbconnection);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -36,6 +50,8 @@ if (app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 
 //app.UseAuthorization();
+
+app.UseCors("_acceptFrontendDomain");
 
 app.MapControllers();
 

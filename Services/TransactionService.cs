@@ -10,6 +10,8 @@ public interface ITransactionService
 
     Task<List<Transaction>> GetTransactionsAsync(int accountId);
 
+    List<List<TransactionType>> GetTransactionTypes();
+
     Transaction? GetTransaction(int accountId, int transactionId);
 
     Task<Transaction?> GetTransactionAsync(int accountId, int transactionId);
@@ -68,7 +70,7 @@ public class TransactionService(
     /// <param name="accountId"><c>AccountId</c> used for finding all transactions under account</param>
     /// <returns><see cref="List<>"/> of <see cref="Transaction"/>s on an Account</returns>
     public List<Transaction> GetTransactions(int accountId){
-        return [.. _context.Transactions.Where(t => t.AccountId == accountId)];
+        return [.. _context.Transactions.Where(t => t.AccountId == accountId).OrderByDescending(t => t.TransactionDate)];
     }
 
     /// <summary>Asyncronous Method finds all <see cref="Transaction"/>s that are associated with an <c>accountId</c>
@@ -77,7 +79,24 @@ public class TransactionService(
     /// <param name="accountId"><c>AccountId</c> used for finding all transactions under account</param>
     /// <returns><see cref="List<>"/> of <see cref="Transaction"/>s on an Account</returns>
     public async Task<List<Transaction>> GetTransactionsAsync(int accountId){
-        return await _context.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
+        return await _context.Transactions.Where(t => t.AccountId == accountId).OrderByDescending(t => t.TransactionDate).ToListAsync();
+    }
+
+    public List<List<TransactionType>> GetTransactionTypes(){
+        var rawTypes = _context.TransactionTypes.OrderBy(t => t.Id).ToList();
+        var types = new List<List<TransactionType>>{};
+        var subs = new List<TransactionType>{};
+        foreach (TransactionType type in rawTypes)
+        {
+            if(type.Id % 1000 == 0){
+                if(subs.Count > 0)
+                    types.Add(subs);
+                subs = [];
+            } 
+            subs.Add(type);
+        }
+        types.Add(subs);
+        return types;
     }
 
     /// <summary>Method finds a single <see cref="Transaction"/> using Primary Key

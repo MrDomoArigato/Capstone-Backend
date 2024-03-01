@@ -9,24 +9,23 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class TransactionController(
-    CapstoneContext context, 
+    //CapstoneContext context, 
     ILogger<TransactionController> logger, 
     IAccountService accountService,
     ITransactionService transactionService) : ControllerBase
 {
-    private readonly CapstoneContext _context = context;
+    //private readonly CapstoneContext _context = context;
     private readonly ILogger<TransactionController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
 
-    #warning TODO: Remove b4 release
+    /* #warning TODO: Remove b4 release
     [HttpGet]
     public async Task<ActionResult<List<Transaction>>> GetAllTransactions()
     {
         var transactions = await _context.Transactions.ToListAsync();
-
         return Ok(transactions);
-    }
+    } */
 
     [HttpGet("{accountId}")]
     public async Task<ActionResult<List<Transaction>>> GetTransactions(int accountId)
@@ -42,6 +41,14 @@ public class TransactionController(
         if(transaction is null)
             return BadRequest();
         return Ok(transaction);
+    }
+
+    [HttpGet("TransactionTypes")]
+    public async Task<ActionResult<List<List<TransactionType>>>> GetTransactionTypes()
+    {
+        var results = _tService.GetTransactionTypes();
+
+        return Ok(results);
     }
 
     [HttpPost]
