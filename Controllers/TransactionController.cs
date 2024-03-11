@@ -84,4 +84,18 @@ public class TransactionController(
 
         return Ok();
     }
+
+       [HttpGet("orderByDate")]
+    public IActionResult GetOrderedByDate(int accountId, int transactionId)
+    {
+        var transactions = _tService.GetTransactionsOrderedByDate(accountId,transactionId);
+        return Ok(transactions);
+    }
+
+    [HttpGet("orderById")]
+    public IActionResult GetOrderedById(int accountId, int transactionId)
+    {
+        var transactions = _tService.GetTransactionsOrderedById(accountId,transactionId);
+        return Ok(transactions);
+    }
 }
