@@ -2,6 +2,7 @@
 using CapstoneApi.Data;
 using CapstoneApi.Database;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CapstoneApi.Services;
 
@@ -20,6 +21,10 @@ public interface ITransactionService
     Task<Transaction?> UpdateTransactionAsync(Transaction updated);
 
     Transaction? DeleteTransaction(int accountId, int transactionId);
+
+    List<Transaction> GetTransactionsOrderedByDate(int accountId, int TransactionDate);
+
+    List<Transaction> GetTransactionsOrderedById(int accountId, int TransactionDate);
 }
 
 public class TransactionService(
@@ -131,5 +136,22 @@ public class TransactionService(
         _context.SaveChanges();
 
         return delete;
+    }
+
+    
+    public List<Transaction> GetTransactionsOrderedByDate(int accountId, int TransactionDate)
+    {
+        return _context.Transactions
+            .OrderBy(t => t.TransactionDate.Year)
+            .ThenBy(t => t.TransactionDate.Month)
+            .ThenBy(t => t.TransactionDate.Day)
+            .ToList();
+    }
+
+        public List<Transaction> GetTransactionsOrderedById(int accountId, int transactionId)
+    {
+        return _context.Transactions
+            .OrderBy(t => t.TransactionId)
+            .ToList();
     }
 }
