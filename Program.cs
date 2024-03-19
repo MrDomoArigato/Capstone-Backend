@@ -9,16 +9,13 @@ builder.Logging.ClearProviders().AddConsole();
 
 # warning TODO: Fix before final release
 builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "_acceptAnyDomain",
-                      policy =>
-                      {
-                          policy.AllowAnyMethod()
-                          .AllowAnyHeader()
-                          .AllowCredentials()
-                          .SetIsOriginAllowed(origin => true);
-                      });
-});
+        {
+            options.AddDefaultPolicy(policy => {
+                policy.AllowAnyOrigin();
+                policy.AllowAnyMethod();
+                policy.AllowAnyHeader();
+            });
+        });
 
 //Gets DB connect from secrets 
 var dbconnection = builder.Configuration.GetSection("db-connection").Get<DBConnection>();
@@ -46,13 +43,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
-//app.UseHttpsRedirection();
+app.UseCors();
 
-//app.UseAuthorization();
-
-app.UseCors("_acceptFrontendDomain");
-
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
