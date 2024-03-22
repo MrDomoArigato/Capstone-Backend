@@ -2,7 +2,6 @@ using CapstoneApi.Data;
 using CapstoneApi.Database;
 using CapstoneApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CapstoneApi.Controllers;
 
@@ -10,23 +9,24 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class AccountController(
-    //CapstoneContext context, 
     ILogger<AccountController> logger, 
     IAccountService accountService,
     ITransactionService transactionService) : ControllerBase
 {
-    //private readonly CapstoneContext _context = context;
     private readonly ILogger<AccountController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
 
-    /* #warning TODO: Remove b4 release
-    [HttpGet]
+    [HttpGet("test")]
     public async Task<ActionResult<List<Account>>> GetAllAccounts()
     {
-        var accounts = await _context.Accounts.ToListAsync();
+        var accounts = await _aService.GetAllAccounts();
+
+        if(accounts is null)
+            return BadRequest();
         return Ok(accounts);
-    } */
+    }
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Account>> GetAccount(int id)

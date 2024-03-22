@@ -1,18 +1,17 @@
 using CapstoneApi.Data;
 using CapstoneApi.Database;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace CapstoneApi.Services;
 
 public interface IAccountService
 {
+    Task<List<Account>?> GetAllAccounts();
     Account? GetAccount(int accountId);
-
     Account? CreateAccount(Account rawAccount);
-
     Account? UpdateAccount(Account updated);
-
     Account? UpdateBalance(int accountId, decimal amount);
-
     Account? DeleteAccount(int accountId);
 }
 
@@ -21,6 +20,10 @@ public class AccountService(
     ILogger<AccountService> logger) : IAccountService{
     private readonly CapstoneContext _context = context;
     private readonly ILogger<AccountService> _logger = logger;
+
+    public async Task<List<Account>?> GetAllAccounts(){
+        return await _context.Accounts.ToListAsync();
+    }
 
     public Account? GetAccount(int accountId){
         return _context.Accounts.Find(accountId);
