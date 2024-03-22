@@ -2,8 +2,10 @@ using CapstoneApi.Database;
 using CapstoneApi.Data;
 using CapstoneApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
+/* var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders().AddConsole();
 
@@ -53,3 +55,23 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+ */
+
+
+ namespace CapstoneApi
+ {
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>(); // Use the Startup class to configure the application
+                });
+    }
+ }

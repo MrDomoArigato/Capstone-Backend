@@ -16,10 +16,11 @@ public interface IBudgetService
 }
 
 public class BudgetService(
-    CapstoneContext context,
-    ILogger<BudgetService> logger) : IBudgetService {
+    CapstoneContext context
+    //ILogger<BudgetService> logger
+    ) : IBudgetService {
     private readonly CapstoneContext _context = context;
-    private readonly ILogger<BudgetService> _logger = logger;
+    //private readonly ILogger<BudgetService> _logger = logger;
 
     public List<Budget> GetAllBudgets(){
         return _context.Budgets.ToList();
@@ -54,7 +55,7 @@ public class BudgetService(
     public int? CreateBudget(int userId, List<List<BudgetDTO>> budgets){
         var transTypes = _context.TransactionTypes;
         var budMap = new Dictionary<string, string>();
-        BudgetDTO last = null;
+        BudgetDTO? last = null;
         decimal total = 0;
         foreach(var bud in budgets.SelectMany(b => b).OrderBy(b => b.Id)){
             if(bud.Id % 1000 != 0 && bud.Amount > 0){

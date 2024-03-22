@@ -11,12 +11,12 @@ namespace CapstoneApi.Controllers;
 [Route("[controller]")]
 public class BudgetController(
     //CapstoneContext context, 
-    ILogger<BudgetController> logger,
+    //ILogger<BudgetController> logger,
     IBudgetService budgetService
 ) : ControllerBase
 {
     //private readonly CapstoneContext _context = context;
-    private readonly ILogger<BudgetController> _logger = logger;
+    //private readonly ILogger<BudgetController> _logger = logger;
     private readonly IBudgetService _bService = budgetService;
 
     /* #warning TODO: Remove b4 release

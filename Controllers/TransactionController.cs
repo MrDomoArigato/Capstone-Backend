@@ -10,12 +10,12 @@ namespace CapstoneApi.Controllers;
 [Route("[controller]")]
 public class TransactionController(
     //CapstoneContext context, 
-    ILogger<TransactionController> logger, 
+    //ILogger<TransactionController> logger, 
     IAccountService accountService,
     ITransactionService transactionService) : ControllerBase
 {
     //private readonly CapstoneContext _context = context;
-    private readonly ILogger<TransactionController> _logger = logger;
+    //private readonly ILogger<TransactionController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
 
