@@ -69,5 +69,16 @@ public class AccountController(
 
         return Ok();
     }
+
+    
+    [HttpGet]
+    public async Task<ActionResult<list<Account>>> GetAccounts([FromQuery] int page = 1, [FromQuery] int count = 100){
+        var accounts = await _context.Accounts
+                                .Skip((page - 1) * count)
+                                .Take(count)
+                                .ToListAsync();
+
+        return Ok(accounts);
+    }
 }
 
