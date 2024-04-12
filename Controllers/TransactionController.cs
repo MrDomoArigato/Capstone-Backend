@@ -98,4 +98,14 @@ public class TransactionController(
         var transactions = _tService.GetTransactionsOrderedById(accountId,transactionId);
         return Ok(transactions);
     }
+
+    [HttpGet]
+    public async Task<ActionResult<list<Transaction>>> GetTransactions([FromQuery] int page = 1, [FromQuery] int count = 100){
+        var transactions = await _context.Transactions
+                                    .Skip((page - 1) * count)
+                                    .Take(count)
+                                    .ToListAsync();
+
+        return Ok(transactions);
+    }
 }
