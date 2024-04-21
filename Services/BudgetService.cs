@@ -11,27 +11,19 @@ public interface IBudgetService
     int? CreateBudget(string userId, List<List<BudgetDTO>> budgets);
 
     int? DeleteBudget(string userId);
-
-    List<Budget> GetAllBudgets();
 }
 
 public class BudgetService(
     CapstoneContext context
-    //,ILogger<BudgetService> logger
     ) : IBudgetService {
     private readonly CapstoneContext _context = context;
-    //private readonly ILogger<BudgetService> _logger = logger;
-
-    public List<Budget> GetAllBudgets(){
-        return _context.Budgets.ToList();
-    }
 
     public async Task<List<List<BudgetDTO>>?> GetBudget(string userId){
+        var results = new List<List<BudgetDTO>>();
         var buds = await _context.Budgets.FindAsync(userId);
         if (buds is null || buds.BudgetItems is null)
             return null;
-        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems.Keys.Contains(x.Id.ToString())).OrderBy(x => x.Id).ToList();
-        var results = new List<List<BudgetDTO>>();
+        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems.Keys.Contains(x.Id)).OrderBy(x => x.Id).ToList();
         var subs = new List<BudgetDTO>{};
         foreach(var type in transTypes)
         {
@@ -44,40 +36,31 @@ public class BudgetService(
                 Id = type.Id,
                 Code = type.Code,
                 Description = type.Description,
-                Amount = decimal.Parse(buds.BudgetItems[type.Id.ToString()])
+                Amount = buds.BudgetItems[type.Id]
             });
         }
-        results.Add(subs);
+        results.Add(subs); 
         return results;
     }
 
     
     public int? CreateBudget(string userId, List<List<BudgetDTO>> budgets){
-        //var transTypes = _context.TransactionTypes;
-        var budMap = new Dictionary<string, string>();
-        BudgetDTO? last = null;
-        decimal total = 0;
-        foreach(var bud in budgets.SelectMany(b => b).OrderBy(b => b.Id)){
-            if(bud.Id % 1000 != 0 && bud.Amount > 0){
-                budMap.Add(bud.Id.ToString(), bud.Amount.ToString());
-                total += bud.Amount;
+        var budMap = new Dictionary<int, decimal>();
+        var budList = budgets.SelectMany(b => b).OrderBy(b => b.Id).ToList();
+        var total = 0m;
+        for(var idx = 0; idx < budList.Count; idx++)
+        {
+            if(budList[idx].Id % 1000 != 0){
+                budMap.Add(budList[idx].Id, budList[idx].Amount);
+                total += budList[idx].Amount;
             }
-            if(last is not null && (int)(bud.Id / 1000) > (int)(last.Id / 1000)){
-                budMap.Add(((int)(bud.Id / 1000) * 1000).ToString(), total.ToString());
+            if(idx + 1 == budList.Count || (budList[idx].Id / 1000) < (budList[idx + 1].Id / 1000)){
+                budMap.Add(((int)(budList[idx].Id / 1000) * 1000), total);
                 total = 0;
             }
-            last = bud;
         }
-        if(last is not null)
-            budMap[((int)(last.Id / 1000) * 1000).ToString()] = total.ToString();
         _context.Budgets.Add(new Budget{UserId = userId, BudgetItems = budMap});
         _context.SaveChanges();
-        // var budgetDb = _context.Budgets.Find(userId);
-        // if(budgetDb is null)
-        //     return 1;
-        // budgetDb.BudgetItems = budMap;
-        // _context.Budgets.Update(budgetDb);
-        // _context.SaveChanges();
         return 0;
     }
 
@@ -90,4 +73,4 @@ public class BudgetService(
         _context.SaveChanges();
         return 0;
     }
-}
+} 

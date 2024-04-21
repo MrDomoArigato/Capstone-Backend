@@ -9,11 +9,9 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class AccountController(
-    ILogger<AccountController> logger, 
     IAccountService accountService,
     ITransactionService transactionService) : ControllerBase
 {
-    private readonly ILogger<AccountController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
     
@@ -26,7 +24,9 @@ public class AccountController(
 
         // Retrieve specific claim values
         var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
+        if(userId is null)
+            return BadRequest();
+            
         var accounts = _aService.GetUserAccounts(userId);
 
         if(accounts is null)

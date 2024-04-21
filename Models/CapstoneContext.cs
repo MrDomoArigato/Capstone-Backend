@@ -6,7 +6,6 @@ namespace CapstoneApi.Database;
 
 public partial class CapstoneContext : DbContext
 {
-    #warning TODO: change schema b4 release
     private readonly string _schema = "dev";
 
     public CapstoneContext()
@@ -105,7 +104,7 @@ public partial class CapstoneContext : DbContext
                 .HasColumnType("json")
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, jsonoptions),
-                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, jsonoptions)
+                    v => JsonSerializer.Deserialize<Dictionary<int, decimal>>(v, jsonoptions)
                 );
         });
 

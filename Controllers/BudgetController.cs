@@ -11,33 +11,10 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class BudgetController(
-    //CapstoneContext context, 
-    //ILogger<BudgetController> logger,
     IBudgetService budgetService
 ) : ControllerBase
 {
-    //private readonly CapstoneContext _context = context;
-    //private readonly ILogger<BudgetController> _logger = logger;
     private readonly IBudgetService _bService = budgetService;
-
-    /* #warning TODO: Remove b4 release
-    [HttpGet]
-    public async Task<ActionResult<List<Budget>>> GetAllBudgets()
-    {
-        var budgets = _bService.GetAllBudgets();
-        return Ok(budgets);
-    } */
-
-    /* #warning TODO: Remove b4 release
-    [HttpPost]
-    public async Task<ActionResult<List<Budget>>> TestCreateBudget(int userId, Dictionary<string, string> budget)
-    {
-        _bService.TestCreateBudget(new Budget{
-            UserId = userId,
-            BudgetItems = budget
-        });
-        return Ok();
-    } */
 
     [HttpGet]
     public async Task<ActionResult<List<List<BudgetDTO>>>> GetBudget()
@@ -47,7 +24,6 @@ public class BudgetController(
 
         // Retrieve specific claim values
         var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        //var userId = "1";
         if(userId is null)
             return BadRequest();
 
@@ -65,7 +41,6 @@ public class BudgetController(
 
         // Retrieve specific claim values
         var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        //var userId = "6a1a7031350d84a9a7a39a125b42e2617abc01693f563dd4b1118f61776f5753";
         if(userId is null)
             return BadRequest();
 

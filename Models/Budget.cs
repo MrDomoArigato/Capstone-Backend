@@ -14,5 +14,5 @@ public partial class BudgetDTO
 public partial class Budget
 {
     public required string UserId { get; init; }
-    public Dictionary<string, string>? BudgetItems { get; set; }
+    public Dictionary<int, decimal>? BudgetItems { get; set; }
 }

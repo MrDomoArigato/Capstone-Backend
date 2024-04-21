@@ -42,10 +42,10 @@ namespace CapstoneApi
                             ValidateIssuer = true,
                             ValidateAudience = true,
                             ValidateLifetime = true,
-                            ValidIssuer = _configuration["JWT:issuer"], // Replace with your actual issuer
-                            ValidAudience = _configuration["JWT:audience"], // Replace with your actual audience
+                            ValidIssuer = _configuration["JWT:issuer"],
+                            ValidAudience = _configuration["JWT:audience"],
                             IssuerSigningKey = new RsaSecurityKey(rsa),
-                            ValidateIssuerSigningKey = true // Replace with your actual secret key
+                            ValidateIssuerSigningKey = true
                         };
                     });
             else

@@ -69,21 +69,21 @@ public class BudgetServiceTests : IDisposable
         _context.Budgets.AddRange(new List<Budget>{
             new(){
                 UserId = "id1",
-                BudgetItems = new Dictionary<string, string>{
-                    {"5000", "300.00"},
-                    {"5001", "100.00"},
-                    {"5002", "200.00"},
-                    {"6000", "400.00"},
-                    {"6001", "400.00"},
-                    {"7000", "100.00"},
-                    {"7001", "100.00"}
+                BudgetItems = new Dictionary<int, decimal>{
+                    {5000, 300.00m},
+                    {5001, 100.00m},
+                    {5002, 200.00m},
+                    {6000, 400.00m},
+                    {6001, 400.00m},
+                    {7000, 100.00m},
+                    {7001, 100.00m}
                 }
             },
             new(){
                 UserId = "id2",
-                BudgetItems = new Dictionary<string, string>{
-                    {"6001", "300.00"},
-                    {"6002", "400.00"}
+                BudgetItems = new Dictionary<int, decimal>{
+                    {6001, 300.00m},
+                    {6002, 400.00m}
                 }
             }
         });
