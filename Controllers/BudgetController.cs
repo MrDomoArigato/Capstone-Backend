@@ -1,9 +1,7 @@
 using System.Security.Claims;
 using CapstoneApi.Data;
-using CapstoneApi.Database;
 using CapstoneApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CapstoneApi.Controllers;
 
@@ -35,7 +33,7 @@ public class BudgetController(
     }
 
     [HttpPost]
-    public async Task<ActionResult> CreateBudget(List<List<BudgetDTO>> budgets){
+    public async Task<ActionResult<List<List<BudgetDTO>>?>> CreateBudget(List<List<BudgetDTO>> budgets){
         // Get user claims from the authenticated principal
         var claims = HttpContext.User.Claims;
 
@@ -56,7 +54,7 @@ public class BudgetController(
     }
 
     [HttpPut]
-    public async Task<ActionResult> UpdateBudget(List<List<BudgetDTO>> budgets){
+    public async Task<ActionResult<List<List<BudgetDTO>>?>> UpdateBudget(List<List<BudgetDTO>> budgets){
         // Get user claims from the authenticated principal
         var claims = HttpContext.User.Claims;
 

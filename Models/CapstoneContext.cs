@@ -6,7 +6,7 @@ namespace CapstoneApi.Database;
 
 public partial class CapstoneContext : DbContext
 {
-    private readonly string _schema = "dev";
+    private readonly string _schema = "public";
 
     public CapstoneContext()
     {
