@@ -68,7 +68,7 @@ namespace CapstoneApi
             // Add controllers
             services.AddControllers(options =>
             {
-                //if(_env.IsProduction())
+                if(_env.IsProduction())
                     options.Filters.Add(new AuthorizeFilter());
             });
         }

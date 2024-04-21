@@ -10,6 +10,10 @@
     <UserSecretsId>6cab8875-ef20-47d8-b780-dbaa3722bd97</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup>
+  <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**</DefaultItemExcludes>
+</PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="JsonProperty.EFCore" Version="2.7.0" />

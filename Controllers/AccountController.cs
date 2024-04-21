@@ -16,21 +16,7 @@ public class AccountController(
     private readonly ILogger<AccountController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
-
-    [HttpGet("test")]
-    public async Task<ActionResult<List<Account>>> GetAllAccounts()
-    {
-        var stuff = this.Request.Cookies;
-
-        foreach(var head in stuff){
-            _logger.LogDebug(head.Value);
-        }
-        var accounts = await _aService.GetAllAccounts();
-
-        if(accounts is null)
-            return BadRequest();
-        return Ok(accounts);
-    }
+    
 
     [HttpGet("user")]
     public async Task<ActionResult<List<Account>>> GetUserAccounts()

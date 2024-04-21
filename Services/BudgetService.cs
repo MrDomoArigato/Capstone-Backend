@@ -7,17 +7,17 @@ namespace CapstoneApi.Services;
 
 public interface IBudgetService
 {
-    Task<List<List<BudgetDTO>>?> GetBudget(int userId);
-    int? CreateBudget(int userId, List<List<BudgetDTO>> budgets);
+    Task<List<List<BudgetDTO>>?> GetBudget(string userId);
+    int? CreateBudget(string userId, List<List<BudgetDTO>> budgets);
 
-    void TestCreateBudget(Budget budget);
+    int? DeleteBudget(string userId);
 
     List<Budget> GetAllBudgets();
 }
 
 public class BudgetService(
     CapstoneContext context
-    //ILogger<BudgetService> logger
+    //,ILogger<BudgetService> logger
     ) : IBudgetService {
     private readonly CapstoneContext _context = context;
     //private readonly ILogger<BudgetService> _logger = logger;
@@ -26,7 +26,7 @@ public class BudgetService(
         return _context.Budgets.ToList();
     }
 
-    public async Task<List<List<BudgetDTO>>?> GetBudget(int userId){
+    public async Task<List<List<BudgetDTO>>?> GetBudget(string userId){
         var buds = await _context.Budgets.FindAsync(userId);
         if (buds is null || buds.BudgetItems is null)
             return null;
@@ -52,8 +52,8 @@ public class BudgetService(
     }
 
     
-    public int? CreateBudget(int userId, List<List<BudgetDTO>> budgets){
-        var transTypes = _context.TransactionTypes;
+    public int? CreateBudget(string userId, List<List<BudgetDTO>> budgets){
+        //var transTypes = _context.TransactionTypes;
         var budMap = new Dictionary<string, string>();
         BudgetDTO? last = null;
         decimal total = 0;
@@ -69,7 +69,7 @@ public class BudgetService(
             last = bud;
         }
         if(last is not null)
-            budMap.Add(((int)(last.Id / 1000) * 1000).ToString(), total.ToString());
+            budMap[((int)(last.Id / 1000) * 1000).ToString()] = total.ToString();
         _context.Budgets.Add(new Budget{UserId = userId, BudgetItems = budMap});
         _context.SaveChanges();
         // var budgetDb = _context.Budgets.Find(userId);
@@ -79,10 +79,15 @@ public class BudgetService(
         // _context.Budgets.Update(budgetDb);
         // _context.SaveChanges();
         return 0;
-    } 
+    }
 
-    public void TestCreateBudget(Budget budget){
-        _context.Budgets.Add(budget);
+    public int? DeleteBudget(string userId){
+        Budget delete = _context.Budgets.Find(userId)!;
+        if(delete is null)
+            return 1;
+
+        _context.Budgets.Remove(delete);
         _context.SaveChanges();
+        return 0;
     }
 }

@@ -99,7 +99,7 @@ public partial class CapstoneContext : DbContext
 
             entity.ToTable("budgets", _schema);
 
-            entity.Property(e => e.UserId).HasColumnName("userid");
+            entity.Property(e => e.UserId).HasColumnName("uid");
             entity.Property(e => e.BudgetItems)
                 .HasColumnName("budget")
                 .HasColumnType("json")
