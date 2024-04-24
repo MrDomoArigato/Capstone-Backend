@@ -80,5 +80,27 @@ public class AccountController(
 
         return Ok(accounts);
     }
+
+    // This method should be part of the IAccountService implementation
+public async Task<Account?> UpdateBalanceAsync(int accountId, decimal newBalance)
+{
+    var current = await GetAccountAsync(accountId);
+
+    if (current == null)
+        return null;
+
+    current.Balance = newBalance;
+    current.BalanceModification = DateTime.Now;
+
+    try {
+        await _context.SaveChangesAsync();
+        return current;
+    } catch (Exception ex) {
+        _logger.LogError(ex, "Error updating balance for account {AccountId}", accountId);
+        // Optionally, handle specific types of exceptions if needed
+        return null;
+    }
+}
+
 }
 
