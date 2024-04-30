@@ -160,6 +160,56 @@ public class BudgetServiceTests : IDisposable
         Assert.Equal(startCount - 1, endCount);
     }
 
+    [Fact]
+    public void UpdateBudgetItem_CreatesBudgetOnDatabase()
+    {
+        var _service = new BudgetService(_context);
+        var startCount = _context.Budgets.Count();
+
+        var result = _service.UpdateBudgetItem("id3", new(){Id = 005000, Amount = 1000});
+
+        var endCount = _context.Budgets.Count();
+
+        Assert.NotNull(result);
+        Assert.Equal(0, result);
+        Assert.Equal(startCount + 1, endCount);
+    }
+
+    [Fact]
+    public void UpdateBudgetItem_AddsToBudgetList()
+    {
+        var _service = new BudgetService(_context);
+
+        var result = _service.UpdateBudgetItem("id3", new(){Id = 006000, Amount = 1000});
+        var result1 = _service.UpdateBudgetItem("id3", new(){Id = 005000, Amount = 1000});
+
+        var endCount = _context.Budgets.Find("id3")!.BudgetItems!.Count;;
+
+        Assert.NotNull(result);
+        Assert.NotNull(result1);
+        Assert.Equal(0, result);
+        Assert.Equal(0, result1);
+        Assert.Equal(2, endCount);
+    }
+
+
+    [Fact]
+    public void DeleteBudgetItem_RemovesFromBudgetList()
+    {
+        var _service = new BudgetService(_context);
+
+        var result = _service.UpdateBudgetItem("id3", new(){Id = 006000, Amount = 1000});
+        var result1 = _service.DeleteBudgetItem("id3", new(){Id = 006000});
+
+        var endCount = _context.Budgets.Find("id3")!.BudgetItems!.Count;;
+
+        Assert.NotNull(result);
+        Assert.NotNull(result1);
+        Assert.Equal(0, result);
+        Assert.Equal(0, result1);
+        Assert.Equal(0, endCount);
+    }
+
     public void Dispose()
     {
         _context.Database.EnsureDeleted();
