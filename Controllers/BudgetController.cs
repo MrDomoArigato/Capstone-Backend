@@ -64,8 +64,6 @@ public class BudgetController(
             return BadRequest();
 
         var deleted = _bService.DeleteBudget(userId);
-        if(deleted != 0)
-            return BadRequest();
         
         var created = _bService.CreateBudget(userId, budgets);
         if(created != 0)
@@ -92,6 +90,40 @@ public class BudgetController(
 
         if(result != 0)
             return BadRequest();
+        return Ok();
+    }
+
+    [HttpPut("Item")]
+    public async Task<ActionResult> UpdateBudgetItem(BudgetDTO budget){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+        
+        var updated = _bService.UpdateBudgetItem(userId, budget);
+        if(updated != 0)
+            return UnprocessableEntity();
+        
+        return Ok();
+    }
+
+    [HttpDelete("Item")]
+    public async Task<ActionResult> DeleteBudgetItem(BudgetDTO budget){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+        
+        var deleted = _bService.DeleteBudgetItem(userId, budget);
+        if(deleted != 0)
+            return UnprocessableEntity();
+        
         return Ok();
     }
 }
