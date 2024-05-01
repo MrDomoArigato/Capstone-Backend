@@ -110,8 +110,8 @@ public class BudgetController(
         return Ok();
     }
 
-    [HttpDelete("Item")]
-    public async Task<ActionResult> DeleteBudgetItem(BudgetDTO budget){
+    [HttpDelete("Item/{id}")]
+    public async Task<ActionResult> DeleteBudgetItem(int id){
         // Get user claims from the authenticated principal
         var claims = HttpContext.User.Claims;
 
@@ -120,7 +120,7 @@ public class BudgetController(
         if(userId is null)
             return BadRequest();
         
-        var deleted = _bService.DeleteBudgetItem(userId, budget);
+        var deleted = _bService.DeleteBudgetItem(userId, id);
         if(deleted != 0)
             return UnprocessableEntity();
         

@@ -14,7 +14,7 @@ public interface IBudgetService
 
     int? UpdateBudgetItem(string userId, BudgetDTO budget);
 
-    int? DeleteBudgetItem(string userId, BudgetDTO budget);
+    int? DeleteBudgetItem(string userId, int budgetId);
 }
 
 public class BudgetService(
@@ -89,12 +89,12 @@ public class BudgetService(
         return 0;
     }
 
-    public int? DeleteBudgetItem(string userId, BudgetDTO budget){
+    public int? DeleteBudgetItem(string userId, int budgetId){
         Budget delete = _context.Budgets.Find(userId)!;
         if(delete is null)
             return 1;
 
-        delete.BudgetItems!.Remove(budget.Id);
+        delete.BudgetItems!.Remove(budgetId);
         _context.Entry(delete).Property(u => u.BudgetItems).IsModified = true;
 
         _context.SaveChanges();

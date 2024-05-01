@@ -199,7 +199,7 @@ public class BudgetServiceTests : IDisposable
         var _service = new BudgetService(_context);
 
         var result = _service.UpdateBudgetItem("id3", new(){Id = 006000, Amount = 1000});
-        var result1 = _service.DeleteBudgetItem("id3", new(){Id = 006000});
+        var result1 = _service.DeleteBudgetItem("id3", 006000);
 
         var endCount = _context.Budgets.Find("id3")!.BudgetItems!.Count;;
 
