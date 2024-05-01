@@ -2,6 +2,7 @@ using CapstoneApi.Data;
 using CapstoneApi.Database;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CapstoneApi.Services;
 
@@ -25,9 +26,9 @@ public class BudgetService(
     public async Task<List<List<BudgetDTO>>?> GetBudget(string userId){
         var results = new List<List<BudgetDTO>>();
         var buds = await _context.Budgets.FindAsync(userId);
-        if (buds is null || buds.BudgetItems is null)
+        if (buds is null || buds.BudgetItems.IsNullOrEmpty())
             return null;
-        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems.Keys.Contains(x.Id)).OrderBy(x => x.Id).ToList();
+        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems!.Keys.Contains(x.Id)).OrderBy(x => x.Id).ToList();
         var subs = new List<BudgetDTO>{};
         foreach(var type in transTypes)
         {
@@ -40,7 +41,7 @@ public class BudgetService(
                 Id = type.Id,
                 Code = type.Code,
                 Description = type.Description,
-                Amount = buds.BudgetItems[type.Id]
+                Amount = buds.BudgetItems![type.Id]
             });
         }
         results.Add(subs); 
