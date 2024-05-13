@@ -9,23 +9,11 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class TransactionController(
-    //CapstoneContext context, 
-    ILogger<TransactionController> logger, 
     IAccountService accountService,
     ITransactionService transactionService) : ControllerBase
 {
-    //private readonly CapstoneContext _context = context;
-    private readonly ILogger<TransactionController> _logger = logger;
     private readonly IAccountService _aService = accountService;
     private readonly ITransactionService _tService = transactionService;
-
-    /* #warning TODO: Remove b4 release
-    [HttpGet]
-    public async Task<ActionResult<List<Transaction>>> GetAllTransactions()
-    {
-        var transactions = await _context.Transactions.ToListAsync();
-        return Ok(transactions);
-    } */
 
     [HttpGet("{accountId}")]
     public async Task<ActionResult<List<Transaction>>> GetTransactions(int accountId)
@@ -58,15 +46,25 @@ public class TransactionController(
         var result = _tService.CreateTransaction(rawTransaction);
         if(result is null)
             return BadRequest();
+        var balUpdate = _aService.TransactionBalance(rawTransaction.AccountId, rawTransaction.Amount);
+        if(balUpdate != 0)
+            return UnprocessableEntity("Unable to update account balance");
         return Ok(result);
     }
 
     [HttpPut]
     public async Task<ActionResult<Transaction>> UpdateTransaction(Transaction updated){
-        var result = await _tService.UpdateTransactionAsync(updated);
+        var original = await _tService.GetTransactionAsync(updated.AccountId, updated.TransactionId);
+        if(original is null)
+            return BadRequest();
 
+        var result = await _tService.UpdateTransactionAsync(updated);
         if(result is null)
             return BadRequest();
+
+        var balUpdate = _aService.TransactionBalance(updated.AccountId, updated.Amount - original.Amount);
+        if(balUpdate != 0)
+            return UnprocessableEntity("Unable to update account balance");
         return result;
     }
 

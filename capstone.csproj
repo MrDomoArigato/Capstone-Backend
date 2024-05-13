@@ -10,9 +10,14 @@
     <UserSecretsId>6cab8875-ef20-47d8-b780-dbaa3722bd97</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup>
+  <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**</DefaultItemExcludes>
+</PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="JsonProperty.EFCore" Version="2.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

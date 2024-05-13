@@ -6,8 +6,7 @@ namespace CapstoneApi.Database;
 
 public partial class CapstoneContext : DbContext
 {
-    #warning TODO: change schema b4 release
-    private readonly string _schema = "dev";
+    private readonly string _schema = "public";
 
     public CapstoneContext()
     {
@@ -99,13 +98,13 @@ public partial class CapstoneContext : DbContext
 
             entity.ToTable("budgets", _schema);
 
-            entity.Property(e => e.UserId).HasColumnName("userid");
+            entity.Property(e => e.UserId).HasColumnName("uid");
             entity.Property(e => e.BudgetItems)
                 .HasColumnName("budget")
                 .HasColumnType("json")
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, jsonoptions),
-                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, jsonoptions)
+                    v => JsonSerializer.Deserialize<Dictionary<int, decimal>>(v, jsonoptions)
                 );
         });
 

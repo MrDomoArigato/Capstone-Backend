@@ -2,35 +2,33 @@ using CapstoneApi.Data;
 using CapstoneApi.Database;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CapstoneApi.Services;
 
 public interface IBudgetService
 {
-    Task<List<List<BudgetDTO>>?> GetBudget(int userId);
-    int? CreateBudget(int userId, List<List<BudgetDTO>> budgets);
+    Task<List<List<BudgetDTO>>?> GetBudget(string userId);
+    int? CreateBudget(string userId, List<List<BudgetDTO>> budgets);
 
-    void TestCreateBudget(Budget budget);
+    int? DeleteBudget(string userId);
 
-    List<Budget> GetAllBudgets();
+    int? UpdateBudgetItem(string userId, BudgetDTO budget);
+
+    int? DeleteBudgetItem(string userId, int budgetId);
 }
 
 public class BudgetService(
-    CapstoneContext context,
-    ILogger<BudgetService> logger) : IBudgetService {
+    CapstoneContext context
+    ) : IBudgetService {
     private readonly CapstoneContext _context = context;
-    private readonly ILogger<BudgetService> _logger = logger;
 
-    public List<Budget> GetAllBudgets(){
-        return _context.Budgets.ToList();
-    }
-
-    public async Task<List<List<BudgetDTO>>?> GetBudget(int userId){
-        var buds = await _context.Budgets.FindAsync(userId);
-        if (buds is null || buds.BudgetItems is null)
-            return null;
-        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems.Keys.Contains(x.Id.ToString())).OrderBy(x => x.Id).ToList();
+    public async Task<List<List<BudgetDTO>>?> GetBudget(string userId){
         var results = new List<List<BudgetDTO>>();
+        var buds = await _context.Budgets.FindAsync(userId);
+        if (buds is null || buds.BudgetItems.IsNullOrEmpty())
+            return null;
+        var transTypes = _context.TransactionTypes.Where(x => buds.BudgetItems!.Keys.Contains(x.Id)).OrderBy(x => x.Id).ToList();
         var subs = new List<BudgetDTO>{};
         foreach(var type in transTypes)
         {
@@ -43,45 +41,64 @@ public class BudgetService(
                 Id = type.Id,
                 Code = type.Code,
                 Description = type.Description,
-                Amount = decimal.Parse(buds.BudgetItems[type.Id.ToString()])
+                Amount = buds.BudgetItems![type.Id]
             });
         }
-        results.Add(subs);
+        results.Add(subs); 
         return results;
     }
 
     
-    public int? CreateBudget(int userId, List<List<BudgetDTO>> budgets){
-        var transTypes = _context.TransactionTypes;
-        var budMap = new Dictionary<string, string>();
-        BudgetDTO last = null;
-        decimal total = 0;
-        foreach(var bud in budgets.SelectMany(b => b).OrderBy(b => b.Id)){
-            if(bud.Id % 1000 != 0 && bud.Amount > 0){
-                budMap.Add(bud.Id.ToString(), bud.Amount.ToString());
-                total += bud.Amount;
+    public int? CreateBudget(string userId, List<List<BudgetDTO>> budgets){
+        var budMap = new Dictionary<int, decimal>();
+        var budList = budgets.SelectMany(b => b).OrderBy(b => b.Id).ToList();
+        var total = 0m;
+        for(var idx = 0; idx < budList.Count; idx++)
+        {
+            if(budList[idx].Id % 1000 != 0){
+                budMap.Add(budList[idx].Id, budList[idx].Amount);
+                total += budList[idx].Amount;
             }
-            if(last is not null && (int)(bud.Id / 1000) > (int)(last.Id / 1000)){
-                budMap.Add(((int)(bud.Id / 1000) * 1000).ToString(), total.ToString());
+            if(idx + 1 == budList.Count || (budList[idx].Id / 1000) < (budList[idx + 1].Id / 1000)){
+                budMap.Add(((int)(budList[idx].Id / 1000) * 1000), total);
                 total = 0;
             }
-            last = bud;
         }
-        if(last is not null)
-            budMap.Add(((int)(last.Id / 1000) * 1000).ToString(), total.ToString());
         _context.Budgets.Add(new Budget{UserId = userId, BudgetItems = budMap});
         _context.SaveChanges();
-        // var budgetDb = _context.Budgets.Find(userId);
-        // if(budgetDb is null)
-        //     return 1;
-        // budgetDb.BudgetItems = budMap;
-        // _context.Budgets.Update(budgetDb);
-        // _context.SaveChanges();
         return 0;
-    } 
-
-    public void TestCreateBudget(Budget budget){
-        _context.Budgets.Add(budget);
-        _context.SaveChanges();
     }
-}
+
+    public int? DeleteBudget(string userId){
+        Budget delete = _context.Budgets.Find(userId)!;
+        if(delete is null)
+            return 1;
+
+        _context.Budgets.Remove(delete);
+        _context.SaveChanges();
+        return 0;
+    }
+
+    public int? UpdateBudgetItem(string userId, BudgetDTO budget){
+        Budget update = _context.Budgets.Find(userId)!;
+        update ??= _context.Budgets.Add(new Budget{UserId = userId, BudgetItems = new Dictionary<int, decimal>()}).Entity;
+
+        update.BudgetItems![budget.Id] = budget.Amount;
+        _context.Entry(update).Property(u => u.BudgetItems).IsModified = true;
+
+        _context.SaveChanges();
+        return 0;
+    }
+
+    public int? DeleteBudgetItem(string userId, int budgetId){
+        Budget delete = _context.Budgets.Find(userId)!;
+        if(delete is null)
+            return 1;
+
+        delete.BudgetItems!.Remove(budgetId);
+        _context.Entry(delete).Property(u => u.BudgetItems).IsModified = true;
+
+        _context.SaveChanges();
+        return 0;
+    }
+} 

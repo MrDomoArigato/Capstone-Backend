@@ -26,11 +26,10 @@ public interface ITransactionService
 }
 
 public class TransactionService(
-    CapstoneContext context,
-    ILogger<TransactionService> logger) : ITransactionService {
+    CapstoneContext context
+    ) : ITransactionService {
     
     private readonly CapstoneContext _context = context;
-    private readonly ILogger<TransactionService> _logger = logger;
 
     /// <summary>Asyncronous Method calulates next available <c>TransactionId</c> from database.
     /// (<paramref name="accountId"/>)

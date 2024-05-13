@@ -1,8 +1,7 @@
+using System.Security.Claims;
 using CapstoneApi.Data;
-using CapstoneApi.Database;
 using CapstoneApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CapstoneApi.Controllers;
 
@@ -10,49 +9,121 @@ namespace CapstoneApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class BudgetController(
-    //CapstoneContext context, 
-    ILogger<BudgetController> logger,
     IBudgetService budgetService
 ) : ControllerBase
 {
-    //private readonly CapstoneContext _context = context;
-    private readonly ILogger<BudgetController> _logger = logger;
     private readonly IBudgetService _bService = budgetService;
 
-    /* #warning TODO: Remove b4 release
     [HttpGet]
-    public async Task<ActionResult<List<Budget>>> GetAllBudgets()
+    public async Task<ActionResult<List<List<BudgetDTO>>>> GetBudget()
     {
-        var budgets = _bService.GetAllBudgets();
-        return Ok(budgets);
-    } */
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
 
-    /* #warning TODO: Remove b4 release
-    [HttpPost]
-    public async Task<ActionResult<List<Budget>>> TestCreateBudget(int userId, Dictionary<string, string> budget)
-    {
-        _bService.TestCreateBudget(new Budget{
-            UserId = userId,
-            BudgetItems = budget
-        });
-        return Ok();
-    } */
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
 
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<List<List<BudgetDTO>>>> GetBudget(int userId)
-    {
         var result = await _bService.GetBudget(userId);
         if(result is null)
             return BadRequest();
+
         return Ok(result);
     }
 
-    [HttpPost("{userId}")]
-    public async Task<ActionResult> CreateBudget(int userId, List<List<BudgetDTO>> budgets){
-        var result = _bService.CreateBudget(userId, budgets);
+    [HttpPost]
+    public async Task<ActionResult<List<List<BudgetDTO>>?>> CreateBudget(List<List<BudgetDTO>> budgets){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+
+        var created = _bService.CreateBudget(userId, budgets);
+        if(created != 0)
+            return BadRequest();
+
+        var result = _bService.GetBudget(userId);
+        if(result is null)
+            return UnprocessableEntity();
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<List<List<BudgetDTO>>?>> UpdateBudget(List<List<BudgetDTO>> budgets){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+
+        var deleted = _bService.DeleteBudget(userId);
+        
+        var created = _bService.CreateBudget(userId, budgets);
+        if(created != 0)
+            return UnprocessableEntity();
+
+        var result = _bService.GetBudget(userId);
+        if(result is null)
+            return UnprocessableEntity();
+        
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteBudget(){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+        
+        var result = _bService.DeleteBudget(userId);
 
         if(result != 0)
             return BadRequest();
+        return Ok();
+    }
+
+    [HttpPut("Item")]
+    public async Task<ActionResult> UpdateBudgetItem(BudgetDTO budget){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+        
+        var updated = _bService.UpdateBudgetItem(userId, budget);
+        if(updated != 0)
+            return UnprocessableEntity();
+        
+        return Ok();
+    }
+
+    [HttpDelete("Item/{id}")]
+    public async Task<ActionResult> DeleteBudgetItem(int id){
+        // Get user claims from the authenticated principal
+        var claims = HttpContext.User.Claims;
+
+        // Retrieve specific claim values
+        var userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId is null)
+            return BadRequest();
+        
+        var deleted = _bService.DeleteBudgetItem(userId, id);
+        if(deleted != 0)
+            return UnprocessableEntity();
+        
         return Ok();
     }
 }
